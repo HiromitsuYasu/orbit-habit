@@ -106,7 +106,7 @@ struct HabitEditorView: View {
                         .disabled(!draft.isValid)
                 }
             }
-            .alert("保存できません", isPresented: errorBinding) {
+            .alert("保存できません", isPresented: $errorMessage.isPresented) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(errorMessage ?? "")
@@ -131,13 +131,6 @@ struct HabitEditorView: View {
             draft.notificationHour = components.hour ?? 20
             draft.notificationMinute = components.minute ?? 0
         }
-    }
-
-    private var errorBinding: Binding<Bool> {
-        Binding(
-            get: { errorMessage != nil },
-            set: { if !$0 { errorMessage = nil } }
-        )
     }
 
     private func save() {

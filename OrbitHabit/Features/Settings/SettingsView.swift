@@ -63,16 +63,12 @@ struct SettingsView: View {
             } message: {
                 Text("習慣と完了記録は元に戻せません。")
             }
-            .alert("削除できません", isPresented: deleteErrorBinding) {
+            .alert("削除できません", isPresented: $deleteError.isPresented) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(deleteError ?? "")
             }
         }
-    }
-
-    private var deleteErrorBinding: Binding<Bool> {
-        Binding(get: { deleteError != nil }, set: { if !$0 { deleteError = nil } })
     }
 
     private func syncNotifications() async {
@@ -114,15 +110,11 @@ private struct HabitOrderView: View {
         .background(AppTheme.background)
         .navigationTitle("習慣を並び替える")
         .toolbar { EditButton() }
-        .alert("並び替えできません", isPresented: errorBinding) {
+        .alert("並び替えできません", isPresented: $errorMessage.isPresented) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(errorMessage ?? "")
         }
-    }
-
-    private var errorBinding: Binding<Bool> {
-        Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })
     }
 
     private func move(from source: IndexSet, to destination: Int) {

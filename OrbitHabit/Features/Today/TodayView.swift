@@ -61,7 +61,7 @@ struct TodayView: View {
             .alert("習慣は最大10件までです。", isPresented: $showsLimitAlert) {
                 Button("OK", role: .cancel) {}
             }
-            .alert("操作を完了できません", isPresented: errorBinding) {
+            .alert("操作を完了できません", isPresented: $errorMessage.isPresented) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(errorMessage ?? "")
@@ -129,10 +129,6 @@ struct TodayView: View {
                 }
             }
         }
-    }
-
-    private var errorBinding: Binding<Bool> {
-        Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })
     }
 
     private func toggle(_ habit: Habit) {

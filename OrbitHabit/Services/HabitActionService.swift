@@ -7,7 +7,7 @@ struct HabitActionService {
     let scheduler: any NotificationScheduling
     let preferences: AppPreferences
     let calendar: Calendar
-    let now: () -> Date
+    let now: @Sendable () -> Date
 
     func create(from draft: HabitDraft, existingCount: Int) async throws {
         guard existingCount < HabitLimits.maxCount else { throw HabitActionError.maximumHabitCountReached }

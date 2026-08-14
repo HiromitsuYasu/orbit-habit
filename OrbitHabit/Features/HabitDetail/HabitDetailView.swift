@@ -43,7 +43,7 @@ struct HabitDetailView: View {
                 dismiss()
             }
         }
-        .alert("操作を完了できません", isPresented: errorBinding) {
+        .alert("操作を完了できません", isPresented: $errorMessage.isPresented) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(errorMessage ?? "")
@@ -129,10 +129,6 @@ struct HabitDetailView: View {
             RateCard(title: "直近7日", rate: metrics.completionRate(for: habit, endingAt: environment.now(), days: 7), color: accent)
             RateCard(title: "直近30日", rate: metrics.completionRate(for: habit, endingAt: environment.now(), days: 30), color: accent)
         }
-    }
-
-    private var errorBinding: Binding<Bool> {
-        Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })
     }
 
     private func toggle(_ day: Date) {
