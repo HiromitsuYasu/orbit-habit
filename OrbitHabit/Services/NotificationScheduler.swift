@@ -53,7 +53,7 @@ final class NotificationScheduler: NotificationScheduling {
         center.removePendingNotificationRequests(withIdentifiers: appRequestIDs)
 
         guard notificationsEnabled else { return }
-        let activeHabits = habits.filter { !$0.isArchived && $0.notificationEnabled }
+        let activeHabits = habits.filter(\.notificationEnabled)
         let start = LocalDay.start(of: now, calendar: calendar)
 
         for offset in 0..<planningHorizonDays {
@@ -81,7 +81,6 @@ final class NotificationScheduler: NotificationScheduling {
     ) async {
         guard notificationsEnabled,
               habit.notificationEnabled,
-              !habit.isArchived,
               HabitSchedule.isScheduled(habit, on: day, calendar: calendar),
               !HabitMetricsCalculator(calendar: calendar).isCompleted(habit, on: day),
               let deliveryDate = calendar.date(
@@ -96,9 +95,11 @@ final class NotificationScheduler: NotificationScheduling {
         }
 
         let content = UNMutableNotificationContent()
-        let isJapanese = locale.language.languageCode?.identifier == "ja"
-        content.title = isJapanese ? "\(habit.name)の時間です" : "Time for \(habit.name)"
-        content.body = isJapanese ? "今日の習慣を完了しましょう。" : "Complete today's habit."
+        content.title = String(
+            format: String(localized: "%@の時間です", locale: locale),
+            habit.name
+        )
+        content.body = String(localized: "今日の習慣を完了しましょう。", locale: locale)
         content.sound = .default
         content.userInfo = ["habitID": habit.id.uuidString]
 

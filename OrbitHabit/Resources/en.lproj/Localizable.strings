@@ -58,3 +58,7 @@
 "完了済みの習慣には同日の通知を送りません。" = "Completed habits won't notify you again that day.";
 "始める" = "Get started";
 "次へ" = "Next";
+"%@の時間です" = "Time for %@";
+"今日の習慣を完了しましょう。" = "Complete today's habit.";
+"この習慣を削除" = "Delete this habit";
+"この習慣を削除しますか？" = "Delete this habit?";

@@ -10,7 +10,7 @@ struct HabitActionService {
     let now: () -> Date
 
     func create(from draft: HabitDraft, existingCount: Int) async throws {
-        guard existingCount < 10 else { throw HabitActionError.maximumHabitCountReached }
+        guard existingCount < HabitLimits.maxCount else { throw HabitActionError.maximumHabitCountReached }
         guard draft.isValid else { throw HabitActionError.invalidHabit }
 
         let habit = Habit(
@@ -26,7 +26,7 @@ struct HabitActionService {
         )
         modelContext.insert(habit)
         try modelContext.save()
-        await resyncNotifications()
+        try await resyncNotifications()
     }
 
     func update(_ habit: Habit, with draft: HabitDraft) async throws {
@@ -41,7 +41,7 @@ struct HabitActionService {
         habit.notificationMinute = draft.notificationMinute
         habit.updatedAt = now()
         try modelContext.save()
-        await resyncNotifications()
+        try await resyncNotifications()
     }
 
     func toggleCompletion(for habit: Habit, on day: Date) async throws {
@@ -92,9 +92,9 @@ struct HabitActionService {
         try modelContext.save()
     }
 
-    private func resyncNotifications() async {
+    private func resyncNotifications() async throws {
         let descriptor = FetchDescriptor<Habit>(sortBy: [SortDescriptor(\.sortIndex)])
-        let habits = (try? modelContext.fetch(descriptor)) ?? []
+        let habits = try modelContext.fetch(descriptor)
         await scheduler.resync(
             habits: habits,
             notificationsEnabled: preferences.notificationsEnabled,

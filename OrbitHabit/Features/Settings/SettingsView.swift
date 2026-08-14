@@ -4,7 +4,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AppEnvironment.self) private var environment
-    @Query(filter: #Predicate<Habit> { $0.isArchived == false }, sort: \Habit.sortIndex) private var habits: [Habit]
+    @Query(sort: \Habit.sortIndex) private var habits: [Habit]
 
     @State private var showsDeleteConfirmation = false
     @State private var deleteError: String?
@@ -100,7 +100,7 @@ struct SettingsView: View {
 private struct HabitOrderView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AppEnvironment.self) private var environment
-    @Query(filter: #Predicate<Habit> { $0.isArchived == false }, sort: \Habit.sortIndex) private var habits: [Habit]
+    @Query(sort: \Habit.sortIndex) private var habits: [Habit]
     @State private var errorMessage: String?
 
     var body: some View {

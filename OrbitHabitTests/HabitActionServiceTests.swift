@@ -108,7 +108,7 @@ final class HabitActionServiceTests: XCTestCase {
         let scheduler = try XCTUnwrap(scheduler)
 
         do {
-            try await service.create(from: validDraft(name: "Overflow"), existingCount: 10)
+            try await service.create(from: validDraft(name: "Overflow"), existingCount: HabitLimits.maxCount)
             XCTFail("Expected maximumHabitCountReached")
         } catch HabitActionError.maximumHabitCountReached {
             // expected
@@ -218,7 +218,7 @@ final class HabitActionServiceTests: XCTestCase {
         var draft = HabitDraft()
         draft.name = name
         draft.iconName = "book.closed"
-        draft.accentToken = "cyan"
+        draft.accentToken = HabitAccentToken.default.rawValue
         draft.weekdayMask = 0b1111111
         draft.notificationEnabled = true
         draft.notificationHour = 20
@@ -231,8 +231,8 @@ final class HabitActionServiceTests: XCTestCase {
         let context = try XCTUnwrap(context)
         let habit = Habit(
             name: name,
-            iconName: "figure.run",
-            accentToken: "cyan",
+            iconName: HabitIconCatalog.default,
+            accentToken: HabitAccentToken.default.rawValue,
             weekdayMask: 0b1111111,
             sortIndex: sortIndex,
             notificationEnabled: true,

@@ -3,7 +3,7 @@ import SwiftUI
 
 struct AnalyticsView: View {
     @Environment(AppEnvironment.self) private var environment
-    @Query(filter: #Predicate<Habit> { $0.isArchived == false }, sort: \Habit.sortIndex) private var habits: [Habit]
+    @Query(sort: \Habit.sortIndex) private var habits: [Habit]
 
     private var metrics: HabitMetricsCalculator {
         HabitMetricsCalculator(calendar: environment.calendar)

@@ -1,20 +1,33 @@
 import Foundation
 
 struct HabitSchedule {
-    /// `Calendar.Component.weekday`を月曜始まりの0...6へ変換して判定します。
-    static func isScheduled(_ habit: Habit, on day: Date, calendar: Calendar) -> Bool {
+    /// `Calendar.Component.weekday`を月曜始まりの0...6へ変換します。
+    static func mondayBasedIndex(for day: Date, calendar: Calendar) -> Int {
         let appleWeekday = calendar.component(.weekday, from: day) // Sun=1 ... Sat=7
-        let mondayBasedIndex = (appleWeekday + 5) % 7              // Mon=0 ... Sun=6
-        return (habit.weekdayMask & (1 << mondayBasedIndex)) != 0
+        return (appleWeekday + 5) % 7 // Mon=0 ... Sun=6
     }
 
-    static func weekdayLabel(for mask: Int, locale: Locale = .autoupdatingCurrent) -> String {
-        let symbols = Calendar.current.shortWeekdaySymbols
-        let mondayFirstSymbols = Array(symbols.dropFirst()) + [symbols[0]]
-        let selected = mondayFirstSymbols.enumerated().compactMap { index, symbol in
+    static func mondayFirstSymbols(from symbols: [String]) -> [String] {
+        guard !symbols.isEmpty else { return [] }
+        return Array(symbols.dropFirst()) + [symbols[0]]
+    }
+
+    static func isScheduled(_ habit: Habit, on day: Date, calendar: Calendar) -> Bool {
+        let index = mondayBasedIndex(for: day, calendar: calendar)
+        return (habit.weekdayMask & (1 << index)) != 0
+    }
+
+    static func weekdayLabel(
+        for mask: Int,
+        calendar: Calendar,
+        locale: Locale = .autoupdatingCurrent
+    ) -> String {
+        let symbols = mondayFirstSymbols(from: calendar.shortWeekdaySymbols)
+        let selected = symbols.enumerated().compactMap { index, symbol in
             (mask & (1 << index)) != 0 ? symbol : nil
         }
-        return selected.joined(separator: locale.language.languageCode?.identifier == "ja" ? "・" : ", ")
+        let separator = locale.language.languageCode?.identifier == "ja" ? "・" : ", "
+        return selected.joined(separator: separator)
     }
 }
 

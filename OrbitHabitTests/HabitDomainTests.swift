@@ -15,22 +15,32 @@ final class HabitDomainTests: XCTestCase {
         let habit = Habit(
             name: "Reading",
             iconName: "book.closed",
-            accentToken: "cyan",
+            accentToken: HabitAccentToken.default.rawValue,
             weekdayMask: 1 << 0,
             sortIndex: 0
         )
         let monday = date(year: 2026, month: 8, day: 10)
         let tuesday = date(year: 2026, month: 8, day: 11)
 
+        XCTAssertEqual(HabitSchedule.mondayBasedIndex(for: monday, calendar: calendar), 0)
+        XCTAssertEqual(HabitSchedule.mondayBasedIndex(for: tuesday, calendar: calendar), 1)
         XCTAssertTrue(HabitSchedule.isScheduled(habit, on: monday, calendar: calendar))
         XCTAssertFalse(HabitSchedule.isScheduled(habit, on: tuesday, calendar: calendar))
+    }
+
+    func testMondayFirstSymbolsRotatesSundayToEnd() {
+        let symbols = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+        XCTAssertEqual(
+            HabitSchedule.mondayFirstSymbols(from: symbols),
+            ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        )
     }
 
     func testCompletionRateExcludesUnscheduledDays() {
         let habit = Habit(
             name: "Reading",
             iconName: "book.closed",
-            accentToken: "cyan",
+            accentToken: HabitAccentToken.default.rawValue,
             weekdayMask: (1 << 0) | (1 << 2) | (1 << 4),
             sortIndex: 0,
             createdAt: date(year: 2026, month: 8, day: 3)
@@ -53,7 +63,7 @@ final class HabitDomainTests: XCTestCase {
         let habit = Habit(
             name: "Run",
             iconName: "figure.run",
-            accentToken: "cyan",
+            accentToken: HabitAccentToken.default.rawValue,
             weekdayMask: (1 << 0) | (1 << 2) | (1 << 4),
             sortIndex: 0,
             createdAt: date(year: 2026, month: 8, day: 3)

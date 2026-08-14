@@ -7,17 +7,19 @@ enum AppTheme {
     static let accentColor = Color(red: 0.35, green: 0.95, blue: 0.96)
     static let secondaryText = Color(red: 0.61, green: 0.66, blue: 0.74)
 
-    static func color(for token: String) -> Color {
+    static func color(for token: HabitAccentToken) -> Color {
         switch token {
-        case "violet": Color(red: 0.67, green: 0.48, blue: 1.00)
-        case "lime": Color(red: 0.69, green: 0.94, blue: 0.39)
-        case "amber": Color(red: 1.00, green: 0.72, blue: 0.30)
-        case "magenta": Color(red: 1.00, green: 0.38, blue: 0.74)
-        default: accentColor
+        case .cyan: accentColor
+        case .violet: Color(red: 0.67, green: 0.48, blue: 1.00)
+        case .lime: Color(red: 0.69, green: 0.94, blue: 0.39)
+        case .amber: Color(red: 1.00, green: 0.72, blue: 0.30)
+        case .magenta: Color(red: 1.00, green: 0.38, blue: 0.74)
         }
     }
 
-    static let accentChoices = ["cyan", "violet", "lime", "amber", "magenta"]
+    static func color(for token: String) -> Color {
+        color(for: HabitAccentToken(rawValue: token) ?? .default)
+    }
 }
 
 struct OrbitCard<Content: View>: View {

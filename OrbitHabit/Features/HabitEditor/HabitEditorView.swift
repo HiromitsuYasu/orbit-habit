@@ -3,20 +3,20 @@ import SwiftUI
 
 struct HabitEditorView: View {
     private let habit: Habit?
+    private let onDeleted: (() -> Void)?
+
     @State private var draft: HabitDraft
     @State private var errorMessage: String?
+    @State private var showsDeleteConfirmation = false
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Environment(AppEnvironment.self) private var environment
-    @Query(filter: #Predicate<Habit> { !$0.isArchived }, sort: \Habit.sortIndex) private var habits: [Habit]
+    @Query(sort: \Habit.sortIndex) private var habits: [Habit]
 
-    private let iconOptions = [
-        "book.closed", "figure.run", "character.book.closed", "sun.max", "drop", "leaf", "brain.head.profile", "pencil"
-    ]
-
-    init(habit: Habit? = nil) {
+    init(habit: Habit? = nil, onDeleted: (() -> Void)? = nil) {
         self.habit = habit
+        self.onDeleted = onDeleted
         _draft = State(initialValue: habit.map(HabitDraft.init) ?? HabitDraft())
     }
 
@@ -30,7 +30,7 @@ struct HabitEditorView: View {
 
                 Section("アイコン") {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 14) {
-                        ForEach(iconOptions, id: \.self) { icon in
+                        ForEach(HabitIconCatalog.options, id: \.self) { icon in
                             Button {
                                 draft.iconName = icon
                             } label: {
@@ -51,26 +51,26 @@ struct HabitEditorView: View {
 
                 Section("テーマカラー") {
                     HStack(spacing: 18) {
-                        ForEach(AppTheme.accentChoices, id: \.self) { token in
+                        ForEach(HabitAccentToken.allCases) { token in
                             Button {
-                                draft.accentToken = token
+                                draft.accentToken = token.rawValue
                             } label: {
                                 Circle()
                                     .fill(AppTheme.color(for: token))
                                     .frame(width: 32, height: 32)
                                     .overlay {
-                                        Circle().stroke(.white, lineWidth: draft.accentToken == token ? 2 : 0)
+                                        Circle().stroke(.white, lineWidth: draft.accentToken == token.rawValue ? 2 : 0)
                                     }
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel(token)
+                            .accessibilityLabel(token.rawValue)
                         }
                     }
                     .padding(.vertical, 6)
                 }
 
                 Section("実行曜日") {
-                    WeekdayPicker(mask: $draft.weekdayMask)
+                    WeekdayPicker(mask: $draft.weekdayMask, calendar: environment.calendar)
                 }
 
                 Section("通知") {
@@ -85,6 +85,12 @@ struct HabitEditorView: View {
                         Text("習慣は最大10件まで追加できます。")
                             .font(.footnote)
                             .foregroundStyle(AppTheme.secondaryText)
+                    }
+                } else {
+                    Section {
+                        Button("この習慣を削除", role: .destructive) {
+                            showsDeleteConfirmation = true
+                        }
                     }
                 }
             }
@@ -104,6 +110,12 @@ struct HabitEditorView: View {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(errorMessage ?? "")
+            }
+            .alert("この習慣を削除しますか？", isPresented: $showsDeleteConfirmation) {
+                Button("削除", role: .destructive) { deleteHabit() }
+                Button("キャンセル", role: .cancel) {}
+            } message: {
+                Text("習慣と完了記録は元に戻せません。")
             }
         }
     }
@@ -144,13 +156,28 @@ struct HabitEditorView: View {
             }
         }
     }
+
+    private func deleteHabit() {
+        guard let habit else { return }
+        let actions = environment.habitActions(modelContext: modelContext)
+        Task {
+            do {
+                try await actions.delete(habit)
+                dismiss()
+                onDeleted?()
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+        }
+    }
 }
 
 private struct WeekdayPicker: View {
     @Binding var mask: Int
+    let calendar: Calendar
+
     private var labels: [String] {
-        let symbols = Calendar.current.veryShortWeekdaySymbols
-        return Array(symbols.dropFirst()) + [symbols[0]]
+        HabitSchedule.mondayFirstSymbols(from: calendar.veryShortWeekdaySymbols)
     }
 
     var body: some View {

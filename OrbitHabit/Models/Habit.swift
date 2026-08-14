@@ -16,7 +16,6 @@ final class Habit {
 
     var createdAt: Date
     var updatedAt: Date
-    var isArchived: Bool
 
     @Relationship(deleteRule: .cascade, inverse: \CompletionRecord.habit)
     var completionRecords: [CompletionRecord] = []
@@ -44,6 +43,5 @@ final class Habit {
         self.notificationMinute = notificationMinute
         self.createdAt = createdAt
         self.updatedAt = createdAt
-        self.isArchived = false
     }
 }

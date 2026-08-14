@@ -5,7 +5,7 @@ struct TodayView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AppEnvironment.self) private var environment
     @Environment(\.scenePhase) private var scenePhase
-    @Query(filter: #Predicate<Habit> { $0.isArchived == false }, sort: \Habit.sortIndex) private var habits: [Habit]
+    @Query(sort: \Habit.sortIndex) private var habits: [Habit]
 
     @State private var showsEditor = false
     @State private var showsLimitAlert = false
@@ -44,7 +44,7 @@ struct TodayView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        if habits.count >= 10 {
+                        if habits.count >= HabitLimits.maxCount {
                             showsLimitAlert = true
                         } else {
                             showsEditor = true

@@ -2,8 +2,8 @@ import Foundation
 
 struct HabitDraft {
     var name: String = ""
-    var iconName: String = "checkmark.circle"
-    var accentToken: String = "cyan"
+    var iconName: String = HabitIconCatalog.default
+    var accentToken: String = HabitAccentToken.default.rawValue
     var weekdayMask: Int = 0
     var notificationEnabled = false
     var notificationHour = 20

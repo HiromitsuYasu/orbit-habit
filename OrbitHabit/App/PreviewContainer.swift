@@ -8,7 +8,7 @@ enum PreviewContainer {
     static let sampleHabit = Habit(
         name: "読書",
         iconName: "book.closed",
-        accentToken: "cyan",
+        accentToken: HabitAccentToken.default.rawValue,
         weekdayMask: 0b1111111,
         sortIndex: 0,
         notificationEnabled: true,

@@ -25,8 +25,7 @@ struct HabitMetricsCalculator {
     }
 
     func overallCompletionRate(for habits: [Habit], endingAt endDate: Date, days: Int) -> Double {
-        let activeHabits = habits.filter { !$0.isArchived }
-        let scheduled = activeHabits.flatMap { habit in
+        let scheduled = habits.flatMap { habit in
             datesEnding(at: endDate, count: days)
                 .filter { HabitSchedule.isScheduled(habit, on: $0, calendar: calendar) }
                 .map { (habit, $0) }

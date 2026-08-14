@@ -4,6 +4,7 @@ import SwiftUI
 struct HabitDetailView: View {
     let habit: Habit
 
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Environment(AppEnvironment.self) private var environment
     @State private var selectedMonth = Date.now
@@ -38,7 +39,9 @@ struct HabitDetailView: View {
             }
         }
         .sheet(isPresented: $showsEditor) {
-            HabitEditorView(habit: habit)
+            HabitEditorView(habit: habit) {
+                dismiss()
+            }
         }
         .alert("操作を完了できません", isPresented: errorBinding) {
             Button("OK", role: .cancel) {}
@@ -53,7 +56,11 @@ struct HabitDetailView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(habit.name)
                     .font(.title2.weight(.bold))
-                Text(HabitSchedule.weekdayLabel(for: habit.weekdayMask))
+                Text(HabitSchedule.weekdayLabel(
+                    for: habit.weekdayMask,
+                    calendar: environment.calendar,
+                    locale: environment.preferences.locale
+                ))
                     .font(.subheadline)
                     .foregroundStyle(AppTheme.secondaryText)
             }
@@ -152,8 +159,7 @@ private struct MonthGrid: View {
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
 
     private var weekdaySymbols: [String] {
-        let symbols = calendar.veryShortWeekdaySymbols
-        return Array(symbols.dropFirst()) + [symbols[0]]
+        HabitSchedule.mondayFirstSymbols(from: calendar.veryShortWeekdaySymbols)
     }
 
     private var days: [Date?] {
@@ -162,7 +168,7 @@ private struct MonthGrid: View {
         else {
             return []
         }
-        let firstIndex = (calendar.component(.weekday, from: interval.start) + 5) % 7
+        let firstIndex = HabitSchedule.mondayBasedIndex(for: interval.start, calendar: calendar)
         let dates = (0..<count).compactMap { offset in
             calendar.date(byAdding: .day, value: offset, to: interval.start)
         }
