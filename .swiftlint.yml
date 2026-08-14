@@ -1,0 +1,62 @@
+included:
+  - OrbitHabit
+  - OrbitHabitTests
+
+excluded:
+  - DerivedData
+  - .build
+  - build
+
+analyzer_rules:
+  - unused_declaration
+  - unused_import
+
+disabled_rules:
+  - todo
+
+opt_in_rules:
+  - empty_count
+  - first_where
+  - implicitly_unwrapped_optional
+  - unneeded_parentheses_in_condition
+
+line_length:
+  warning: 140
+  error: 180
+  ignores_comments: true
+  ignores_urls: true
+
+function_body_length:
+  warning: 120
+  error: 180
+
+type_body_length:
+  warning: 450
+  error: 650
+
+file_length:
+  warning: 700
+  error: 900
+
+cyclomatic_complexity:
+  warning: 18
+  error: 26
+
+force_cast:
+  severity: error
+
+force_try:
+  severity: error
+
+force_unwrapping:
+  severity: error
+
+identifier_name:
+  min_length:
+    warning: 2
+  excluded:
+    - id
+    - on
+    - to
+
+reporter: "xcode"
