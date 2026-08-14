@@ -16,7 +16,7 @@ settings:
     INFOPLIST_KEY_UILaunchScreen_Generation: YES
     INFOPLIST_KEY_CFBundleDisplayName: Orbit Habit
     ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
-    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
     CLANG_WARN_DOCUMENTATION_COMMENTS: YES
     CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER: YES
 
@@ -33,11 +33,13 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.example.orbithabit
-        PRODUCT_NAME: Orbit Habit
+        PRODUCT_NAME: OrbitHabit
         SWIFT_EMIT_LOC_STRINGS: YES
     preBuildScripts:
       - name: SwiftLint
         basedOnDependencyAnalysis: false
+        inputFiles:
+          - $(SRCROOT)/.swiftlint.yml
         script: |
           if command -v swiftlint >/dev/null; then
             swiftlint lint --config "${SRCROOT}/.swiftlint.yml"
@@ -56,3 +58,22 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.example.orbithabit.tests
         GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  OrbitHabit:
+    build:
+      targets:
+        OrbitHabit: all
+        OrbitHabitTests: [test]
+    test:
+      targets:
+        - OrbitHabitTests
+      gatherCoverageData: false
+    run:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

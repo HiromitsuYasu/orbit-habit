@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SwiftData
 
 @Observable
 @MainActor
@@ -10,8 +11,8 @@ final class AppEnvironment {
     var now: @Sendable () -> Date
 
     init(
-        preferences: AppPreferences = AppPreferences(),
-        notificationScheduler: some NotificationScheduling = NotificationScheduler(),
+        preferences: AppPreferences,
+        notificationScheduler: some NotificationScheduling,
         calendar: Calendar = .autoupdatingCurrent,
         now: @escaping @Sendable () -> Date = { .now }
     ) {
@@ -21,5 +22,18 @@ final class AppEnvironment {
         self.now = now
     }
 
-    static let live = AppEnvironment()
+    func habitActions(modelContext: ModelContext) -> HabitActionService {
+        HabitActionService(
+            modelContext: modelContext,
+            scheduler: notificationScheduler,
+            preferences: preferences,
+            calendar: calendar,
+            now: now
+        )
+    }
+
+    static let live = AppEnvironment(
+        preferences: AppPreferences(),
+        notificationScheduler: NotificationScheduler()
+    )
 }

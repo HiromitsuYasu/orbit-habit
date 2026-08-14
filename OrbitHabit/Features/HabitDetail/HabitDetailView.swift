@@ -130,16 +130,10 @@ struct HabitDetailView: View {
 
     private func toggle(_ day: Date) {
         guard HabitSchedule.isScheduled(habit, on: day, calendar: environment.calendar) else { return }
-        let service = HabitActionService(
-            modelContext: modelContext,
-            scheduler: environment.notificationScheduler,
-            preferences: environment.preferences,
-            calendar: environment.calendar,
-            now: environment.now
-        )
+        let actions = environment.habitActions(modelContext: modelContext)
         Task {
             do {
-                try await service.toggleCompletion(for: habit, on: day)
+                try await actions.toggleCompletion(for: habit, on: day)
             } catch {
                 errorMessage = error.localizedDescription
             }

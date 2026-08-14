@@ -136,16 +136,10 @@ struct TodayView: View {
     }
 
     private func toggle(_ habit: Habit) {
-        let service = HabitActionService(
-            modelContext: modelContext,
-            scheduler: environment.notificationScheduler,
-            preferences: environment.preferences,
-            calendar: environment.calendar,
-            now: environment.now
-        )
+        let actions = environment.habitActions(modelContext: modelContext)
         Task {
             do {
-                try await service.toggleCompletion(for: habit, on: environment.now())
+                try await actions.toggleCompletion(for: habit, on: environment.now())
             } catch {
                 errorMessage = error.localizedDescription
             }

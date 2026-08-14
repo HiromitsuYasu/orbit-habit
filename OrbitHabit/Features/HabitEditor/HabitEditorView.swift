@@ -129,20 +129,14 @@ struct HabitEditorView: View {
     }
 
     private func save() {
-        let service = HabitActionService(
-            modelContext: modelContext,
-            scheduler: environment.notificationScheduler,
-            preferences: environment.preferences,
-            calendar: environment.calendar,
-            now: environment.now
-        )
+        let actions = environment.habitActions(modelContext: modelContext)
 
         Task {
             do {
                 if let habit {
-                    try await service.update(habit, with: draft)
+                    try await actions.update(habit, with: draft)
                 } else {
-                    try await service.create(from: draft, existingCount: habits.count)
+                    try await actions.create(from: draft, existingCount: habits.count)
                 }
                 dismiss()
             } catch {

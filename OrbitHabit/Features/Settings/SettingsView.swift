@@ -86,16 +86,10 @@ struct SettingsView: View {
     }
 
     private func deleteAll() {
-        let service = HabitActionService(
-            modelContext: modelContext,
-            scheduler: environment.notificationScheduler,
-            preferences: environment.preferences,
-            calendar: environment.calendar,
-            now: environment.now
-        )
+        let actions = environment.habitActions(modelContext: modelContext)
         Task {
             do {
-                try await service.deleteAll(habits: habits)
+                try await actions.deleteAll(habits: habits)
             } catch {
                 deleteError = error.localizedDescription
             }
@@ -132,15 +126,9 @@ private struct HabitOrderView: View {
     }
 
     private func move(from source: IndexSet, to destination: Int) {
-        let service = HabitActionService(
-            modelContext: modelContext,
-            scheduler: environment.notificationScheduler,
-            preferences: environment.preferences,
-            calendar: environment.calendar,
-            now: environment.now
-        )
+        let actions = environment.habitActions(modelContext: modelContext)
         do {
-            try service.move(habits, from: source, to: destination)
+            try actions.move(habits, from: source, to: destination)
         } catch {
             errorMessage = error.localizedDescription
         }
